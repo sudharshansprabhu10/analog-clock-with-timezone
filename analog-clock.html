@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elegant Analog Clock</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .clock-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .clock {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .center-point {
+            width: 15px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            z-index: 3;
+            border-radius: 4px;
+        }
+
+        .hour {
+            width: 8px;
+            height: 80px;
+            background: #333;
+            transform: translateX(-50%);
+        }
+
+        .minute {
+            width: 6px;
+            height: 110px;
+            background: #666;
+            transform: translateX(-50%);
+        }
+
+        .second {
+            width: 2px;
+            height: 120px;
+            background: #ff6b6b;
+            transform: translateX(-50%);
+        }
+
+        .number {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .pendulum {
+            width: 4px;
+            height: 100px;
+            background: #666;
+            position: absolute;
+            top: 300px;
+            transform-origin: top;
+        }
+
+        .pendulum-bob {
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -10px;
+            left: -8px;
+        }
+
+        .swing {
+            animation: swing 2s ease-in-out;
+        }
+
+        @keyframes swing {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-20deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        select {
+            margin-top: 20px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        select optgroup {
+            font-weight: bold;
+            color: #666;
+        }
+
+        select option {
+            padding: 4px;
+            color: #333;
+        }
+
+        .digital-time {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="clock">
+            <div class="center-point"></div>
+            <div class="hand hour"></div>
+            <div class="hand minute"></div>
+            <div class="hand second"></div>
+            <div id="numbers"></div>
+        </div>
+        <div class="pendulum">
+            <div class="pendulum-bob"></div>
+        </div>
+    </div>
+    <select id="timezone">
+        <optgroup label="UTC/GMT">
+            <option value="UTC">UTC (Coordinated Universal Time)</option>
+        </optgroup>
+        
+        <optgroup label="Americas">
+            <option value="America/New_York">New York (EST/EDT)</option>
+            <option value="America/Chicago">Chicago (CST/CDT)</option>
+            <option value="America/Denver">Denver (MST/MDT)</option>
+            <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+            <option value="America/Anchorage">Anchorage (AKST/AKDT)</option>
+            <option value="Pacific/Honolulu">Hawaii (HST)</option>
+            <option value="America/Toronto">Toronto</option>
+            <option value="America/Vancouver">Vancouver</option>
+            <option value="America/Mexico_City">Mexico City</option>
+            <option value="America/Bogota">Bogota</option>
+            <option value="America/Sao_Paulo">São Paulo</option>
+            <option value="America/Argentina/Buenos_Aires">Buenos Aires</option>
+            <option value="America/Santiago">Santiago</option>
+        </optgroup>
+
+        <optgroup label="Europe">
+            <option value="Europe/London">London (GMT/BST)</option>
+            <option value="Europe/Paris">Paris (CET/CEST)</option>
+            <option value="Europe/Berlin">Berlin</option>
+            <option value="Europe/Madrid">Madrid</option>
+            <option value="Europe/Rome">Rome</option>
+            <option value="Europe/Amsterdam">Amsterdam</option>
+            <option value="Europe/Brussels">Brussels</option>
+            <option value="Europe/Vienna">Vienna</option>
+            <option value="Europe/Stockholm">Stockholm</option>
+            <option value="Europe/Copenhagen">Copenhagen</option>
+            <option value="Europe/Oslo">Oslo</option>
+            <option value="Europe/Helsinki">Helsinki</option>
+            <option value="Europe/Moscow">Moscow</option>
+        </optgroup>
+
+        <optgroup label="Asia">
+            <option value="Asia/Dubai">Dubai</option>
+            <option value="Asia/Shanghai">Shanghai</option>
+            <option value="Asia/Tokyo">Tokyo</option>
+            <option value="Asia/Hong_Kong">Hong Kong</option>
+            <option value="Asia/Singapore">Singapore</option>
+            <option value="Asia/Seoul">Seoul</option>
+            <option value="Asia/Bangkok">Bangkok</option>
+            <option value="Asia/Jakarta">Jakarta</option>
+            <option value="Asia/Manila">Manila</option>
+            <option value="Asia/Kolkata">Mumbai/New Delhi (IST)</option>
+            <option value="Asia/Tehran">Tehran</option>
+            <option value="Asia/Jerusalem">Jerusalem</option>
+            <option value="Asia/Riyadh">Riyadh</option>
+        </optgroup>
+
+        <optgroup label="Oceania">
+            <option value="Pacific/Auckland">Auckland</option>
+            <option value="Australia/Sydney">Sydney</option>
+            <option value="Australia/Melbourne">Melbourne</option>
+            <option value="Australia/Brisbane">Brisbane</option>
+            <option value="Australia/Perth">Perth</option>
+            <option value="Pacific/Fiji">Fiji</option>
+        </optgroup>
+
+        <optgroup label="Africa">
+            <option value="Africa/Cairo">Cairo</option>
+            <option value="Africa/Johannesburg">Johannesburg</option>
+            <option value="Africa/Lagos">Lagos</option>
+            <option value="Africa/Nairobi">Nairobi</option>
+            <option value="Africa/Casablanca">Casablanca</option>
+            <option value="Africa/Accra">Accra</option>
+        </optgroup>
+    </select>
+    <div class="digital-time" id="digital-time"></div>
+
+    <script>
+        // Create clock numbers
+        const numbersDiv = document.getElementById('numbers');
+        const radius = 130;
+        const center = 150;
+
+        for (let i = 1; i <= 12; i++) {
+            const number = document.createElement('div');
+            number.className = 'number';
+            
+            const angle = (i * 30 - 90) * (Math.PI / 180);
+            const x = center + radius * Math.cos(angle);
+            const y = center + radius * Math.sin(angle);
+            
+            number.style.left = `${x - 15}px`;
+            number.style.top = `${y - 15}px`;
+            number.textContent = i;
+            
+            numbersDiv.appendChild(number);
+        }
+
+        // Get elements
+        const hourHand = document.querySelector('.hour');
+        const minuteHand = document.querySelector('.minute');
+        const secondHand = document.querySelector('.second');
+        const pendulum = document.querySelector('.pendulum');
+        const timezoneSelect = document.getElementById('timezone');
+        const digitalTime = document.getElementById('digital-time');
+
+        let lastHour = -1;  // Track the last hour to detect changes
+
+        function updateClock() {
+            const now = moment().tz(timezoneSelect.value);
+            
+            const hours = now.hours();
+            const minutes = now.minutes();
+            const seconds = now.seconds();
+
+            // Calculate angles
+            const secondDegrees = (seconds / 60) * 360;
+            const minuteDegrees = ((minutes + seconds/60) / 60) * 360;
+            const hourDegrees = ((hours % 12 + minutes/60) / 12) * 360;
+
+            // Update hand positions
+            secondHand.style.transform = `translateX(-50%) rotate(${secondDegrees}deg)`;
+            minuteHand.style.transform = `translateX(-50%) rotate(${minuteDegrees}deg)`;
+            hourHand.style.transform = `translateX(-50%) rotate(${hourDegrees}deg)`;
+
+            // Update digital time
+            digitalTime.textContent = now.format('HH:mm:ss');
+
+            // Check if hour has changed
+            if (hours !== lastHour) {
+                // Remove old animation
+                pendulum.classList.remove('swing');
+                // Trigger reflow
+                void pendulum.offsetWidth;
+                // Add new animation
+                pendulum.classList.add('swing');
+                lastHour = hours;
+            }
+        }
+
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial update
+
+        // Update when timezone changes
+        timezoneSelect.addEventListener('change', () => {
+            lastHour = -1;  // Reset hour tracking on timezone change
+            updateClock();
+        });
+    </script>
+</body>
+</html>
